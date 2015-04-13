@@ -1,0 +1,75 @@
+-------------------------------------
+New branch: properWorkspaceMood
+
+Need to implement a proper temporary "workspace" mood that we can modify without contaminating other moods. For example right now we display the default mood in moodindex, however this mood is used as a boilerplate to create new moods. If we modify default we end up incorrectly modifying that boilerplate. I want to:
+
+1) Sequester the default mood. It should not appear in the moodindex. Only in the Moods factory
+2) Any time we render the edit view, we clone/copy the requested mood and make that active. Any changes to this should not affect any previously-saved moods.
+3) I think I also need to use another unique identifier for the moodIndex other than label. Angular doesn't allow duplicate values in its ngRepeat. Need to find out if this extends only to the props that are printed out or anything.
+
+...
+
+Eventually, I need to consider moving to JSON.stringifying the features for porting state (as opposed to solely localstorage). We can save in localstorage but user should be able to request an export url which will contain the features/settings in it. It will be something like this:
+ /view/?eyes=i&nose=|&mouth=U&hair=||||&label=snarky&id=1234
+ 
+-------------------------------------
+
+// Ability to:
+// - get a feature set 				// Features.get( featureSet )
+// - get all feature set 				// Features.get()
+// - add a feature to a feature set 	// Features.add( featureSet, val )
+// - (?) remove a feature from a set 	// Features.remove( featureSet, val )
+
+// - get a mood 							// Moods.get( mood.id )
+// - get all moods 							// Moods.get()
+
+// - update a detail in the current mood 		// Moods.update( mood.id, feature, val )
+// - load a current mood (existing)			// Moods.setCurrent( mood.id )
+// - load a current mood (new)					// Moods.setCurrent( mood.label, featuresObj )
+// - add new mood 								// Moods.create( mood.label, featuresObj )
+// - remove mood 								// Moods.remove( mood.id )
+
+/*
+
+View
+	load an existing mood on the canvas.
+	Option to edit mood. I can't decide if we should offer the choices grid here or not
+		=> /build-a-face/{{mood.label}}
+
+Create/Edit
+	create new mood
+		=> /build-a-face/edit/
+	edit existing mood
+		=> /build-a-face/edit/{{mood.label}}
+			offer ability to edit label
+
+Save
+	save over existing mood
+		=> /build-a-face/save/{{mood.label}}
+			offer ability to input label
+	save new mood
+		=> /build-a-face/save/
+
+*/
+/*
+how are we going to keep track of the currently loaded mood?
+
+1. store the current mood in Moods factory
+2. any time we want to 
+
+
+*/
+
+
+-------------
+as I was trying to say, I'm testing out creating a file via "touch" then editing it with "vi". Thing is, I could NOT figure out how to save and exit this thing. I now know that you need to hit ESC, then colon (:) then "wq" for save and exit or "q!" for exit without saving. Let's try that again.
+
+localstorage notes;
+	// localStorageService.isSupported
+	localStorageService.set('author','devorah');
+	$scope.author = localStorageService.get('author');
+
+
+
+
+

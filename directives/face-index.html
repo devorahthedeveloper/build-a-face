@@ -1,0 +1,32 @@
+<div class="faceIndex">
+	<h3>Your saved faces:</h3>
+
+	<div ng-show="faces | isEmpty" class="note">You have no saved faces</div>
+	<ul class="saved-faces-list block">
+		<li ng-repeat="face in faces" ng-class="{'grid-container': true, 'grid-parent': true, 'active': active === face.id}">
+			<!-- currently-editing -->
+			<span ng-if="active === face.id">
+				<span class="grid-75 grid-parent">
+					{{face.label}} <em>(editing)</em>
+				</span>
+				<span class="grid-25 grid-parent actions">
+					<a ng-click="deleteThis(face.id)"><i class="fa fa-trash-o"></i></a>									
+				</span>
+
+			</span>
+
+			<!-- non-editing -->
+			<span ng-if="active !== face.id">
+				<span class="grid-75 grid-parent">
+					<a href="#/{{face.id}}/edit">{{face.label}}</a>
+				</span>
+				<span class="grid-25 grid-parent actions">
+					<a class="button button-sm cancel" href="#/{{face.id}}/edit"><i class="delete fa fa-pencil"></i></a>
+					<a ng-click="deleteThis(face.id)"><i class="fa fa-trash-o"></i></a>				
+					
+				</span>
+			</span>
+		</li>
+		
+	</ul>
+</div>

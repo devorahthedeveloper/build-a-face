@@ -1,0 +1,11 @@
+<div ng-include src="'partils/header.html'"></div>
+<section class="panel grid-20">
+	<div face-index faces="savedFaces"></div>
+</section>
+<section class="panel grid-30 canvas">	
+	<div face-canvas face="face"></div>
+	<label for="">Give your face a name</label>
+	<input type="text" class="liquid" ng-model="face.id" /> <br>
+	<a class="button liquid" ng-click="saveface(face.id)">Save face</a>
+	<a class="button liquid" href="#/{{face.id}}/edit/">Cancel (back to edit mode)</a>
+</section>

@@ -1,0 +1,47 @@
+<div class="grid-container panel-main">
+	<div class="grid-25">
+		<div class="panel">
+			<div saved-faces faces="savedFaces" on-delete="deleteFace" active="face.id"></div>
+		</div>
+	</div>
+	<div class="grid-40">
+		<div class="panel">
+
+			<!-- new face -->
+			<div ng-show="state.isNewFace">
+				<h2>Create a new face</h2>
+				<div class="block">
+					<h3>Name your face:</h3>
+					<input type="text" class="grid-100" ng-model="tempFace.label" ng-change="updateFeature('label')" ng-enter="createFace(face, tempFace.label)"  placeholder="untitled">
+				</div>
+			</div>
+			
+			<!-- existing face -->
+			<div ng-show="!state.isNewFace">
+				<h3>You are editing:</h3>
+				<div class="face-label" ng-hide="state.showLabel">
+					<a ng-click="state.showLabel = true">{{face.label}} <i class="edit fa fa-pencil"></i></a>
+				</div>
+				<div ng-show="state.showLabel" class="block">
+					<input type="text" class="grid-100" ng-model="tempFace.label" ng-change="updateFeature('label')" ng-enter="saveChanges(face, tempFace.label)" placeholder="untitled">
+					<a ng-click="saveChanges(face, tempFace.label)">Save changes</a> | 
+					<a ng-click="cancelChanges('label')">Cancel</a>
+				</div>
+			</div>
+
+			<div class="canvas block">
+				<div face-canvas face="face"></div>
+			</div>
+
+			<div ng-include src="'partials/alert-box.html'"></div>	
+		</div>
+	</div>
+	<div class="grid-35">
+		<div class="panel">
+			<div ng-include src="'partials/controls.html'"></div>	
+		</div>
+	</div>
+</div>
+
+
+

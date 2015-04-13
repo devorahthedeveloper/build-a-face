@@ -1,0 +1,24 @@
+Major Features: 
+- when deleting a face, user gets a modal asking "are you sure you want to delete?"
+- split out saveLabel and saveFeature into separate methods so user can save each independently
+- user can export a face via url for sharing
+- user can import a previously-exported face
+- user can create their own values for a featureSet (custom)
+
+Other:
+- clean up code/folder structure as per John Papas style guide
+- explore using underscore's unique id generator
+
+
+DONE:
+- test that deleting a face doesn't break localstorage conventions
+- ability to select "none" for a featureSet
+- if there are no saved faces, add text "You currently have no saved faces"
+- user can delete a previously-saved face
+- user can edit the name of a previously-saved face
+- combine new.html and edit.html into a single template
+
+
+Notes:
+- check out https://www.airpair.com/angularjs/posts/top-10-mistakes-angularjs-developers-make
+	- underscore turned into a module

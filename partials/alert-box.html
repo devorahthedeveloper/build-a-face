@@ -1,0 +1,9 @@
+<div ng-class="{'block': true, 'grid-100': true, 'alert-box': true, 'highlighted': state.isEdited}">
+	<div class="message grid-100">
+		<div class="helper-text">{{messages.helperText}} </div>
+		<div ng-show="state.isEdited">
+			<a class="button" ng-click="state.isNewFace ? createFace(face, tempFace.label) : saveChanges(face)">{{messages.saveText}}</a>
+			<a class="button cancel" ng-click="cancelChanges()">{{messages.cancelText}}</a>
+		</div>
+	</div>
+</div>

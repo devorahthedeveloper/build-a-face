@@ -1,0 +1,6 @@
+<div class="chooser grid-100">
+	<h3 class="chooser-title" ng-transclude></h3> 
+	<ul class="chooser-options">
+		<li ng-repeat="choice in choices" ng-click="select(choice)" ng-class="{'active': choice === selected}">{{choice == '' ? 'none' : choice}}</li>
+	</ul>
+</div>
