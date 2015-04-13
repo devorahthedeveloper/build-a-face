@@ -1,1 +1,1 @@
-Simple app to construct typographic facial expressions - my first angular app. I also plan to incorporate LESS or SASS after I get the functionality intact.
+A light-hearted AngularJS app for building faces out of typographic features.
