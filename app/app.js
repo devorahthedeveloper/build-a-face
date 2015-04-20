@@ -56,18 +56,15 @@ var appCtrl = faceApp.controller('AppCtrl', function($rootScope, $location){
 
 });
 
-
-		
 // localstorage: https://github.com/auth0/angular-storage
-
 
 // Called from $routeProvider resolve function.
 // Responsible for fetching the requested face or serving the generic face in absence of a valid one
-appCtrl.routeData = function($q, $location, $route, FaceService, store) {
+appCtrl.routeData = function($q, $location, $route, FaceStorageService, store) {
 
 	var deferred = $q.defer();
 	var requestedId = $route.current.params.id;
-	var found = requestedId ? FaceService.find( requestedId ) : FaceService.getGeneric(); // store either a valid requested face or the generic face
+	var found = requestedId ? FaceStorageService.find( requestedId ) : FaceStorageService.getGeneric(); // store either a valid requested face or the generic face
 
 	if ( found ) { 
 		deferred.resolve({ 
@@ -89,7 +86,7 @@ appCtrl.routeData = function($q, $location, $route, FaceService, store) {
 };
 
 // Controller that handles view-related logic
-var viewCtrl = faceApp.controller('ViewCtrl', function($scope, $routeParams, $location, routeData, FaceService, FeatureService){
+var viewCtrl = faceApp.controller('ViewCtrl', function($scope, $routeParams, $location, routeData, StateService, FaceBuilderService, FaceStorageService, FeatureService){
 
 	/* ---------- Scope methods ---------- */
 	$scope.createFace = function(newFace, label){
@@ -99,14 +96,14 @@ var viewCtrl = faceApp.controller('ViewCtrl', function($scope, $routeParams, $lo
 
 		// We have all the information we need. Proceed with creating a new face
 		newFace.label = label;
-		newFace = FaceService.create( newFace );
+		newFace = FaceStorageService.create( newFace );
 
 		// redirect to the newly-created face's edit state
 		$location.path('/' + newFace.id + '/edit'); 
 	};
 
 	$scope.deleteFace = function(id){
-		FaceService.delete( id );
+		FaceStorageService.delete( id );
 		$location.path('/'); 
 	};
 
@@ -127,9 +124,9 @@ var viewCtrl = faceApp.controller('ViewCtrl', function($scope, $routeParams, $lo
 		// apply the temp label to the face
 		$scope.face.label = $scope.tempFace.label || 'untitled';
 
-		// Update the faceservice and reset all states/messages
-		FaceService.update( $scope.face.id, $scope.face );
-		$scope.reset();
+		// Update the facestorageService and reset all states/messages
+		FaceStorageService.update( $scope.face.id, $scope.face );
+		$scope.resetState();
 	};
 
 	$scope.cancelChanges = function(item) {
@@ -140,11 +137,11 @@ var viewCtrl = faceApp.controller('ViewCtrl', function($scope, $routeParams, $lo
 
 		} else {
 			$scope.face = angular.copy( routeData.found );
-			$scope.reset();
+			$scope.resetState();
 		}
 	};
 
-	$scope.reset = function(item){
+	$scope.resetState = function(item){
 
 		// reset states
 		$scope.state.isEdited = false;
@@ -166,7 +163,9 @@ var viewCtrl = faceApp.controller('ViewCtrl', function($scope, $routeParams, $lo
 
 	// Place features and faces on scope
 	$scope.features = FeatureService.list();
-	$scope.savedFaces = FaceService.list();
+	$scope.savedFaces = FaceStorageService.list();
+	// $scope.builder = FaceBuilderService;
+	// $scope.state = StateService;
 
 	// Set app-wide messages and initial state obj
 	$scope.state = {};
@@ -174,7 +173,7 @@ var viewCtrl = faceApp.controller('ViewCtrl', function($scope, $routeParams, $lo
 	$scope.messages.saveText = $scope.state.isNewFace ? 'Save your new face' : 'Save changes';
 	$scope.messages.cancelText = $scope.state.isNewFace ? 'Reset' : 'Discard changes';
 
-	$scope.reset();
+	$scope.resetState();
 
 });
 
@@ -202,7 +201,7 @@ faceApp.factory('UtilService', function(){
 		},
 
 		getMaxId: function getMaxId(arr){
-			return _.max(arr, function(item){return item.id}).id;
+			return _.max(arr, function(item){return item.id;}).id;
 		},
 
 		getIndex: function getIndex( arr, id ){
@@ -216,10 +215,68 @@ faceApp.factory('UtilService', function(){
 
 			return foundIndex;
 		}
-	}
+	};
 });
 
-faceApp.factory('FaceService', function( FeatureService, UtilService, store ){
+
+faceApp.factory('StateService', function(  ){
+	var messages = {
+		save: {
+			'new': 'Save your new face',
+			'existing': 'Save changes'
+		},
+		cancel: {
+			'new': 'Reset',
+			'existing': 'Discard changes'
+		},
+		helper: {
+			'new': '',
+			'existing': 'No unsaved changes'
+		}
+	};
+
+	function setText(type, isNew){
+		var state = isNew ? 'new' : 'existing';
+		return messages[type][state] || '';
+	}
+
+	return {
+		// state booleans
+		state: {
+			isNewFace: true,
+			isEdited: false,
+			isAlert: false,
+			isEditingLabel: false,
+			showLabel: false,
+			saveText: setText('save', this.isNewFace),
+			cancelText: setText('cancel', this.isNewFace),
+			helperText: setText('helper', this.isNewFace)
+		},
+
+		// reset method
+		reset: function( routePath ){
+			state.isEdited = false;
+			state.isAlert = false;
+			state.isEditingLabel = false;
+			state.showLabel = false;
+			state.isNewFace = routePath === '/';
+			state.helperText = setText('helper', state.isNewFace);
+
+			// reset temp face and helper text
+			// messages.helperText = state.isNewFace ? '' : 'No unsaved changes...';
+			// $scope.tempFace.label = $scope.face.label;
+
+		}
+	};
+});
+
+faceApp.factory('FaceBuilderService', function( StateService ){
+	return {
+		
+	};
+});
+
+faceApp.factory('FaceStorageService', function( FeatureService, UtilService, store ){
 	
 	// get the localstorage namespace
 	var faces = store.getNamespacedStore('faces');
@@ -245,7 +302,7 @@ faceApp.factory('FaceService', function( FeatureService, UtilService, store ){
 				highestIndex = highestIndex ? highestIndex++ : 0; 
 			}
 			_counter++;
-		} while ( _counter <= highestIndex )
+		} while ( _counter <= highestIndex );
 
 		// reset highestIndex in localstorage to reflect updated value
 		store.set('highestIndex', UtilService.getMaxId(_initCache)); 
@@ -257,13 +314,13 @@ faceApp.factory('FaceService', function( FeatureService, UtilService, store ){
 		getGeneric: function(){
 			return {
 				features: {eyes: '-', nose: '.', 	mouth: 'v' }
-			}
+			};
 		},
 		list: function(){
 			return cache;
 		},
 		find: function( id ){
-			return _.find(cache, function(face){return face.id == id});
+			return _.find(cache, function(face){return face.id == id;});
 		},
 		create: function( newObj ){
 			// generate a new id based on previous max id
@@ -288,7 +345,7 @@ faceApp.factory('FaceService', function( FeatureService, UtilService, store ){
 			var updated;
 
 			if (existing) {
-				faces.set(id, cache[id] = newObj)
+				faces.set(id, cache[id] = newObj);
 			} else {
 				return false;
 			}
@@ -328,7 +385,7 @@ faceApp.factory('FeatureService', function(){
 		listOneSet: function(featureSet){
 			return _features[featureSet];
 		}
-	}
+	};
 });
 
 
@@ -339,7 +396,7 @@ faceApp.factory('FeatureService', function(){
 faceApp.directive('faceCanvas', function(){
 	return {
 		scope: {
-			 face: '='
+			face: '='
 		},
 		templateUrl: 'directives/face.html'
 	};
@@ -349,10 +406,10 @@ faceApp.directive('featureChooser', function(){
 	return {
 		transclude: true,
 		scope: {
-			 feature: '@',
-			 choices: '=',
-			 selected: '=',
-			 onSelect: '&onSelect'
+			feature: '@',
+			choices: '=',
+			selected: '=',
+			onSelect: '&onSelect'
 		},
 		templateUrl: 'directives/feature-chooser.html',
 		controller: function($scope){
@@ -379,9 +436,9 @@ faceApp.directive('featureChooser', function(){
 faceApp.directive('savedFaces', function(){
 	return {
 		scope: {
-			 faces: '=',
-			 active: '=',
-			 onDelete: '&onDelete'
+			faces: '=',
+			active: '=',
+			onDelete: '&onDelete'
 		 },
 		templateUrl: 'directives/face-index.html',
 		controller: function($scope){
@@ -409,7 +466,11 @@ faceApp.directive('ngEnter', function () {
     };
 });
 
-// http://adamalbrecht.com/2013/12/12/creating-a-simple-modal-dialog-directive-in-angular-js/
+// Todo - build modal directive
+// Possible - http://adamalbrecht.com/2013/12/12/creating-a-simple-modal-dialog-directive-in-angular-js/
+faceApp.directive('modal', function () {
+    return function () {};
+});
 
 /* ----------------------------------------
  * FILTERS
@@ -417,9 +478,8 @@ faceApp.directive('ngEnter', function () {
  */
 // http://stackoverflow.com/questions/17839141/angularjs-checking-if-a-js-object-is-empty-works-with-ng-show-but-not-from-cont
 faceApp.filter('isEmpty', function () {
-	var bar;
 	return function (obj) {
-		for (bar in obj) {
+		for (var bar in obj) {
 			if (obj.hasOwnProperty(bar)) {
 				return false;
 			}

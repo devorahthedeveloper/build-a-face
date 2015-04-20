@@ -9,6 +9,7 @@ Major Features:
 Other:
 - clean up code/folder structure as per John Papas style guide
 - explore using underscore's unique id generator
+- minify/concatonate js and css
 
 
 DONE:
@@ -23,3 +24,68 @@ DONE:
 Notes:
 - check out https://www.airpair.com/angularjs/posts/top-10-mistakes-angularjs-developers-make
 	- underscore turned into a module
+
+
+-----------------------------------------------------------------------------
+Revised directory structure
+-----------------------------------------------------------------------------
+
+** Current components ** 
+
+	Factories:
+	- UtilService
+	- StateService
+	- FaceStorageService
+	- FaceBuilderService
+	- FeatureService
+
+	Directives:
+	- faceCanvas
+	- featureChooser
+	- savedFaces
+	- ngEnter
+
+	Filters:
+	- isEmpty
+
+	Controllers:
+	- appCtrl
+	- appCtrl.routeData
+	- viewCtrl
+
+
+** Distinct components **
+	- app
+	- router
+	- face canvas
+	- controls
+	- saved face history
+	- header
+
+** Proposed directory **
+* still needs work.
+	/app
+		/face
+			face-directive.js
+			face-builder-service.js
+		/storage
+			face-storage-service.js
+			saved-faces-directive.js
+		/features
+			feature-service.js
+			feature-chooser-directive.js
+
+		/shared
+			/routes
+			/header
+			/util
+				util-service.js
+
+
+	/assets
+		/img
+		/css
+		/script
+		/libs
+	index.html
+
