@@ -1,6 +1,7 @@
 Major Features: 
 - when deleting a face, user gets a modal asking "are you sure you want to delete?"
 - split out saveLabel and saveFeature into separate methods so user can save each independently
+- when user creates new face, teh default label should be "untitled", instead of offering an emtpy text field.
 - user can export a face via url for sharing
 - user can import a previously-exported face
 - user can create their own values for a featureSet (custom)
